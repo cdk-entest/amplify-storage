@@ -6,6 +6,9 @@
 .pnp.js
 amplify
 .vscode
+test
+styles 
+
 
 # testing
 /coverage
