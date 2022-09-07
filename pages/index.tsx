@@ -10,7 +10,7 @@ const Home: NextPage = () => {
   return (
     <div>
       <UploadForm processFile={uploadToS3}></UploadForm>
-      {imageUrl && <Image src={imageUrl} boxSize={"sm"}></Image>}
+      {imageUrl && <Image src={imageUrl} width="300px" height={"auto"}></Image>}
       <Button
         onClick={async () => {
           const url = await getS3Object();
