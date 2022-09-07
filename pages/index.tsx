@@ -3,7 +3,7 @@ import { Storage } from "aws-amplify";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { UploadForm } from "../src/components/upload-form";
-import { uploadToS3, getS3Object, listImages } from "../src/services/storage";
+import { uploadToS3, getS3Object } from "../src/services/storage";
 
 const ListImages = ({
   images,
@@ -72,7 +72,7 @@ const Home: NextPage = () => {
           <Image src={imageUrl} width="auto" height={"350px"}></Image>
         )}
       </Box>
-      <UploadForm processFile={uploadToS3}></UploadForm>
+      <UploadForm processFile={uploadToS3} setImages={setImages}></UploadForm>
       <ListImages images={images} setImageUrl={setImageUrl}></ListImages>
     </Flex>
   );

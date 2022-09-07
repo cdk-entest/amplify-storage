@@ -15,12 +15,14 @@ import {
 } from "@chakra-ui/react";
 import { FiFile } from "react-icons/fi";
 import { useRef, useState } from "react";
+import { Storage } from "aws-amplify";
 
 type UploadFormProps = {
   processFile: (file: File, setProgress?: any) => Promise<void>;
+  setImages?: any;
 };
 
-export const UploadForm = ({ processFile }: UploadFormProps) => {
+export const UploadForm = ({ processFile, setImages }: UploadFormProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("Your File ...");
@@ -31,8 +33,13 @@ export const UploadForm = ({ processFile }: UploadFormProps) => {
       colorScheme="green"
       minW={"150px"}
       onClick={async () => {
-        processFile(selectedFile as File, setProgress);
+        await processFile(selectedFile as File, setProgress);
         setSelectedFile(null);
+        // list images against
+        Storage.list("").then((result) => {
+          const keys = result.map((item) => item.key);
+          setImages(keys);
+        });
       }}
     >
       Upload
