@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Image, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Image, Text } from "@chakra-ui/react";
 import { Storage } from "aws-amplify";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
@@ -13,16 +13,25 @@ const ListImages = ({
   setImageUrl: any;
 }) => {
   return (
-    <div style={{ width: "100%" }}>
+    <Flex
+      direction={"column"}
+      width={"100%"}
+      height={"300px"}
+      overflowY={"auto"}
+      marginTop={"20px"}
+    >
       {images.map((image, id) => (
         <Flex
           key={id}
           width={"100%"}
           justifyContent={"space-between"}
           padding={"5px"}
+          backgroundColor={"gray.100"}
+          marginBottom={"5px"}
         >
           <Text>{image}</Text>
           <Button
+            colorScheme={"green"}
             onClick={async () => {
               const url = await getS3Object(image);
               setImageUrl(url);
@@ -32,7 +41,7 @@ const ListImages = ({
           </Button>
         </Flex>
       ))}
-    </div>
+    </Flex>
   );
 };
 
