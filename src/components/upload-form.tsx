@@ -1,4 +1,3 @@
-
 // haimtran 10 AUG 2022
 // 1. amplify storage upload s3 and progress
 // 2. create a custom upload form using react-hook-form
@@ -68,13 +67,7 @@ export const UploadForm = ({ processFile }: UploadFormProps) => {
   };
 
   return (
-    <Flex
-      direction={"column"}
-      gap={"20px"}
-      maxWidth="1000px"
-      margin={"auto"}
-      marginTop={"200px"}
-    >
+    <Flex width={"100%"} direction={"column"} gap={"5px"}>
       <FormControl>
         <InputGroup>
           <InputLeftElement>

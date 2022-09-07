@@ -14,12 +14,19 @@ export const uploadToS3 = async (file: File, setProgress: any) => {
   }
 };
 
-export const getS3Object = async () => {
-  const signUrl = await Storage.get("image-1.jpeg", {
+export const getS3Object = async (key: string) => {
+  const signUrl = await Storage.get(key, {
     expires: 900,
     level: "public",
     download: false,
   });
   console.log(signUrl);
   return signUrl;
+};
+
+export const listImages = async () => {
+  Storage.list("").then((result) => {
+    const keys = result.map((item) => item.key);
+    return keys;
+  });
 };
