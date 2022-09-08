@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Image, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Text } from "@chakra-ui/react";
 import { Storage } from "aws-amplify";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
@@ -45,6 +45,23 @@ const ListImages = ({
   );
 };
 
+const ViewImage = ({ imageUrl }: { imageUrl: string }) => {
+  return (
+    <Box
+      bg={"gray.100"}
+      width={"1000px"}
+      height={"500px"}
+      padding={"20px"}
+      display={"flex"}
+      justifyContent={"center"}
+      alignItems={"center"}
+      marginBottom={"20px"}
+    >
+      {imageUrl && <Image src={imageUrl} width="auto" height={"350px"}></Image>}
+    </Box>
+  );
+};
+
 const Home: NextPage = () => {
   const [imageUrl, setImageUrl] = useState<string>();
   const [images, setImages] = useState<string[]>([]);
@@ -67,20 +84,7 @@ const Home: NextPage = () => {
       direction="column"
       alignItems="center"
     >
-      <Box
-        bg={"gray.100"}
-        width={"1000px"}
-        height={"500px"}
-        padding={"20px"}
-        display={"flex"}
-        justifyContent={"center"}
-        alignItems={"center"}
-        marginBottom={"20px"}
-      >
-        {imageUrl && (
-          <Image src={imageUrl} width="auto" height={"350px"}></Image>
-        )}
-      </Box>
+      <ViewImage imageUrl={imageUrl!}></ViewImage>
       <UploadForm processFile={uploadToS3} setImages={setImages}></UploadForm>
       <ListImages images={images} setImageUrl={setImageUrl}></ListImages>
     </Flex>
