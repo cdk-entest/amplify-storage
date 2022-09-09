@@ -1,34 +1,169 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+---
+title: Upload to S3 from Browser using AWS Amplify Storage
+description: Upload to S3 from Browser using AWS Amplify Storage
+author: haimtran
+publishedDate: 08/10/2022
+date: 2022-08-10
+---
 
-## Getting Started
+## Introduction
 
-First, run the development server:
+[GitHub](https://github.com/entest-hai/amplify-storage) this shows
+
+- setup amplify project for nextjs
+- upload and download objects to and from a s3 bucket
+- working with amplify storage api (signed url)
+
+<LinkedImage
+  href="https://youtu.be/pKiPciFBrhk"
+  height={400}
+  alt="Amplify Hosting NextJS Static Web"
+  src="/thumbnail/amplify-storage.png"
+/>
+
+## Amplify Init
+
+init
 
 ```bash
-npm run dev
-# or
-yarn dev
+amplify init
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+add auth with default and login by email
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+amplify add auth
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+add storage
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+amplify add storage
+```
 
-## Learn More
+then push to aws
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+amplify push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Amplify Storage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+simple upload by amplify storage
 
-## Deploy on Vercel
+```tsx
+import { Storage } from "aws-amplify";
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+export const uploadToS3 = async (file: File, setProgress: any) => {
+  console.log("uploading file to s3 ...", file);
+  try {
+    const result = await Storage.put(file.name, file, {
+      progressCallback(value) {
+        setProgress((100.0 * value.loaded) / value.total);
+      },
+    });
+  } catch (error) {
+    console.log("error upload file to s3: ", error);
+  }
+};
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Create Upload Form
+
+configure react-hook-form and fileName and progress.
+
+```tsx
+const inputRef = useRef<HTMLInputElement | null>(null);
+const [selectedFile, setSelectedFile] = useState<File | null>(null);
+const [fileName, setFileName] = useState("Your File ...");
+const [progress, setProgress] = useState(1);
+const name = "FirstName";
+
+const { handleSubmit, control } = useForm({
+  defaultValues: {
+    FirstName: "",
+  },
+  mode: "onChange",
+});
+
+const { field, fieldState, formState } = useController({
+  name,
+  control,
+  rules: { required: true },
+  defaultValue: "",
+});
+```
+
+upload button and choose file button
+
+```tsx
+const uploadButton = (
+  <Button
+    onClick={async () => {
+      await uploadToS3(selectedFile as File, setProgress);
+      // setFileName("Your File ...");
+      // setSelectedFile(null);
+    }}
+  >
+    Upload
+  </Button>
+);
+
+const chooseFileButton = (inputRef: any) => (
+  <Button onClick={() => inputRef.current?.click()}>Choose File</Button>
+);
+```
+
+hidden the input
+
+```tsx
+const HiddenInput = () => {
+  return (
+    <input
+      type={"file"}
+      name={"FirstName"}
+      ref={(e) => {
+        field.ref(e);
+        inputRef.current = e;
+      }}
+      onChange={(event) => {
+        if (event.target.files && event.target.files.length > 0) {
+          setFileName(event.target.files[0].name);
+          setSelectedFile(event.target.files[0]);
+        }
+      }}
+      style={{ display: "none" }}
+    ></input>
+  );
+};
+```
+
+the entire upload form
+
+```tsx
+<Flex
+  direction={"column"}
+  gap={"20px"}
+  maxWidth="1000px"
+  margin={"auto"}
+  marginTop={"200px"}
+>
+  <FormControl>
+    <InputGroup>
+      <InputLeftElement>
+        <Icon as={FiFile}></Icon>
+      </InputLeftElement>
+      <HiddenInput></HiddenInput>
+      <Input
+        placeholder="Your file ..."
+        value={fileName}
+        onChange={(e) => console.log(e)}
+      ></Input>
+      <InputRightElement width={"auto"}>
+        {selectedFile ? uploadButton : chooseFileButton(inputRef)}
+      </InputRightElement>
+    </InputGroup>
+  </FormControl>
+  <Progress value={progress}></Progress>
+</Flex>
+```
